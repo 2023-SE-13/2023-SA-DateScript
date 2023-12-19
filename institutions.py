@@ -3,6 +3,42 @@ import pandas as pd
 import os
 import json
 import gzip
+import paramiko
+
+def upload_file(local_path, remote_path, hostname, port, username, password):
+    # 创建SSH客户端
+    client = paramiko.SSHClient()
+    sftp = None  # 初始化 sftp 对象
+
+    try:
+        # 自动添加服务器的主机密钥到本地的known_hosts文件中
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        # 连接服务器
+        client.connect(hostname=hostname, port=port, username=username, password=password)
+
+        # 创建SFTP客户端
+        sftp = client.open_sftp()
+
+        # 获取远程目录路径和文件名
+        remote_directory = remote_path.rsplit('/', 1)[0]
+        remote_filename = remote_path.rsplit('/', 1)[1]
+        print(remote_directory)
+        print(remote_filename)
+        # 检查远程目录是否存在，如果不存在则创建
+        try:
+            sftp.stat(remote_directory)
+        except FileNotFoundError:
+            sftp.mkdir(remote_directory)
+
+        # 上传文件
+        sftp.put(local_path, remote_path)
+
+    finally:
+        # 关闭SFTP客户端和SSH客户端的连接
+        if sftp is not None:
+            sftp.close()
+        client.close()
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
@@ -85,4 +121,11 @@ if __name__ == '__main__':
                 file.write(']')
 
             # 此时在当前目录下有相应的json文件,需上传至服务器
+            local_file_path = os.path.join(current_dir, file_name)
+            remote_file_path = "/home/sa/Data-Script/institution/" + file_name
+            hostname = "116.63.49.180"
+            port = 22  # 默认SSH端口为22
+            username = "sa"
+            password = "@buaa-sa-13"
 
+            upload_file(local_file_path, remote_file_path, hostname, port, username, password)
