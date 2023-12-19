@@ -55,7 +55,7 @@ if __name__ == '__main__':
             new_data = []
             for index in range(num):
                 a_data = {
-                    "id": data[index].get("id"),
+                    "aid": data[index].get("id"),
                     "display_name": data[index].get("display_name", "NULL"),
                     "cited_by_count": data[index].get("cited_by_count", "NULL"),
                     "counts_by_year": data[index].get("counts_by_year", "NULL"),

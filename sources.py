@@ -7,7 +7,7 @@ import gzip
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    test_au_dir = os.path.join(current_dir, "works")
+    test_au_dir = os.path.join(current_dir, "sources")
 
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
@@ -55,26 +55,18 @@ if __name__ == '__main__':
             new_data = []
             for index in range(num):
                 a_data = {
-                        "wid": data[index].get("id", "NULL"),
-                        "doi": data[index].get("doi", "NULL"),
-                        "title": data[index].get("title", "NULL"),
-                        "display_name": data[index].get("display_name", "NULL"),
-                        "publication_year": data[index].get("publication_year", "NULL"),
-                        "publication_date": data[index].get("publication_date", "NULL"),
-                        "language": data[index].get("language", "NULL"),
-                        "primary_location": data[index].get("primary_location", "NULL"),
-                        "type": data[index].get("type", "NULL"),
-                        "authorships": data[index].get("authorships", "NULL"),
-                        "countries_distinct_count": data[index].get("countries_distinct_count", "NULL"),
-                        "institutions_distinct_count": data[index].get("institutions_distinct_count", "NULL"),
+                        "sid": data[index].get("id", "NULL"),
+                        "abbreviated_title": data[index].get("abbreviated_title", "NULL"),
+                        "alternate_titles": data[index].get("alternate_titles", "NULL"),
                         "cited_by_count": data[index].get("cited_by_count", "NULL"),
-                        "keywords": data[index].get("keywords", "NULL"),  # 设置默认值为 "NULL"
-                        "referenced_works_count": data[index].get("referenced_works_count", "NULL"),
-                        "referenced_works": data[index].get("referenced_works", "NULL"),
-                        "related_works": data[index].get("related_works", "NULL"),
+                        "country_code": data[index].get("country_code", "NULL"),
                         "counts_by_year": data[index].get("counts_by_year", "NULL"),
-                        "updated_date": data[index].get("updated_date", "NULL"),
-                        "created_date": data[index].get("created_date", "NULL"),
+                        "display_name": data[index].get("display_name", "NULL"),
+                        "homepage_url": data[index].get("homepage_url", "NULL"),
+                        "summary_stats": data[index].get("summary_stats", "NULL"),
+                        "type": data[index].get("type", "NULL"),
+                        "works_api_url": data[index].get("works_api_url", "NULL"),
+                        "works_count": data[index].get("works_count", "NULL"),
                     # "display_name": data[index]["display_name"]
                 }
                 new_data.append(a_data)
