@@ -20,10 +20,11 @@ if __name__ == '__main__':
 
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
+            directory_name = []
             # 检查文件是否是 .gz 压缩文件
             if file_name.endswith('.gz'):
                 file_path = os.path.join(root, file_name)
-
+                print(file_path)
                 # 创建解压后的文件路径
                 extract_file_path = os.path.splitext(file_path)[0]
 
@@ -32,11 +33,23 @@ if __name__ == '__main__':
                     with open(extract_file_path, 'wb') as extracted_file:
                         extracted_file.write(gz_file.read())
 
+                for i in range(3):
+                    # new_data.append(a_data)
+                    directory_name.append(os.path.basename(file_path))
+                    # print(directory_name)
+                    # 获取目录部分的路径
+                    file_path = os.path.dirname(file_path)
+
             print(file_name)
             file_name = file_name[:-3]
+
+            file_path = os.path.join(root, file_name)
+
+            # file_list = os.listdir(file_name)
+            # print(file_list)
             # file_path = os.path.join(root, file_name)
             # print(file_path)
-            with open(file_name, 'r') as file:
+            with open(file_path, 'r') as file:
                 content = file.read()
 
             num = 0
@@ -66,6 +79,7 @@ if __name__ == '__main__':
 
             file_name = file_name+".json"
             # 输出到 data.json 文件
+            file_name = directory_name[2]+"_"+directory_name[1]+"_"+file_name
             with open(file_name, 'w') as file:
                 file.write('[')
                 # json.dump(new_data, file, indent=4)
