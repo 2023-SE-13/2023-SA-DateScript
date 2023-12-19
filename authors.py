@@ -5,6 +5,7 @@ import json
 import gzip
 import paramiko
 
+
 def upload_file(local_path, remote_path, hostname, port, username, password):
     # 创建SSH客户端
     client = paramiko.SSHClient()
@@ -71,6 +72,7 @@ if __name__ == '__main__':
 
             print(file_name)
             file_name = file_name[:-3]
+            temp_name = file_name
 
             file_path = os.path.join(root, file_name)
 
@@ -106,9 +108,9 @@ if __name__ == '__main__':
                 }
                 new_data.append(a_data)
 
-            file_name = file_name+".json"
+            file_name = file_name + ".json"
             # 输出到 data.json 文件
-            file_name = directory_name[2]+"_"+directory_name[1]+"_"+file_name
+            file_name = directory_name[2] + "_" + directory_name[1] + "_" + file_name
             with open(file_name, 'w') as file:
                 file.write('[')
                 # json.dump(new_data, file, indent=4)
@@ -128,4 +130,9 @@ if __name__ == '__main__':
 
             upload_file(local_file_path, remote_file_path, hostname, port, username, password)
 
-            
+            file_path = os.path.join(directory_name[2], directory_name[1],temp_name)
+
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            if os.path.exists(file_name):
+                os.remove(file_name)

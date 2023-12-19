@@ -72,6 +72,7 @@ if __name__ == '__main__':
 
             print(file_name)
             file_name = file_name[:-3]
+            temp_name = file_name
 
             file_path = os.path.join(root, file_name)
 
@@ -131,3 +132,10 @@ if __name__ == '__main__':
             password = "@buaa-sa-13"
 
             upload_file(local_file_path, remote_file_path, hostname, port, username, password)
+
+            file_path = os.path.join(directory_name[2], directory_name[1], temp_name)
+
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            if os.path.exists(file_name):
+                os.remove(file_name)
