@@ -34,6 +34,9 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
         # 上传文件
         sftp.put(local_path, remote_path)
 
+        done_file_remote_path = remote_path + '.done'
+        sftp.open(done_file_remote_path, 'w').close()
+
     finally:
         # 关闭SFTP客户端和SSH客户端的连接
         if sftp is not None:
