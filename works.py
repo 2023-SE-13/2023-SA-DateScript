@@ -1,9 +1,9 @@
-# 这是一个示例 Python 脚本。
 import pandas as pd
 import os
 import json
 import gzip
 import paramiko
+
 
 def upload_file(local_path, remote_path, hostname, port, username, password):
     # 创建SSH客户端
@@ -13,18 +13,15 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
     try:
         # 自动添加服务器的主机密钥到本地的known_hosts文件中
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
         # 连接服务器
         client.connect(hostname=hostname, port=port, username=username, password=password)
-
         # 创建SFTP客户端
         sftp = client.open_sftp()
 
         # 获取远程目录路径和文件名
         remote_directory = remote_path.rsplit('/', 1)[0]
         remote_filename = remote_path.rsplit('/', 1)[1]
-        print(remote_directory)
-        print(remote_filename)
+
         # 检查远程目录是否存在，如果不存在则创建
         try:
             sftp.stat(remote_directory)
@@ -34,6 +31,7 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
         # 上传文件
         sftp.put(local_path, remote_path)
 
+        # 在远程服务器上创建.done文件
         done_file_remote_path = remote_path + '.done'
         sftp.open(done_file_remote_path, 'w').close()
 
@@ -43,99 +41,79 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
             sftp.close()
         client.close()
 
+def process_json_file(efile_path):
+    with open(efile_path, 'r') as file:
+        for line in file:
+            if line.strip():  # 确保行非空
+                obj = json.loads(line)
+                a_data = {
+                    "wid": obj.get("id", "NULL"),
+                        "doi": obj.get("doi", "NULL"),
+                        "title": obj.get("title", "NULL"),
+                        "display_name": obj.get("display_name", "NULL"),
+                        "publication_year": obj.get("publication_year", "NULL"),
+                        "publication_date": obj.get("publication_date", "NULL"),
+                        "language": obj.get("language", "NULL"),
+                        "primary_location": obj.get("primary_location", "NULL"),
+                        "type": obj.get("type", "NULL"),
+                        "authorships": obj.get("authorships", "NULL"),
+                        "countries_distinct_count": obj.get("countries_distinct_count", "NULL"),
+                        "institutions_distinct_count": obj.get("institutions_distinct_count", "NULL"),
+                        "cited_by_count": obj.get("cited_by_count", "NULL"),
+                        "keywords": obj.get("keywords", "NULL"),  # 设置默认值为 "NULL"
+                        "referenced_works_count": obj.get("referenced_works_count", "NULL"),
+                        "referenced_works": obj.get("referenced_works", "NULL"),
+                        "related_works": obj.get("related_works", "NULL"),
+                        "counts_by_year": obj.get("counts_by_year", "NULL"),
+                        "updated_date": obj.get("updated_date", "NULL"),
+                        "created_date": obj.get("created_date", "NULL"),
+                }
+                yield a_data
+
+
+def write_json_data(ggenerator, output_file):
+    with open(output_file, 'w') as file:
+        file.write('[')
+        first = True
+        for item in ggenerator:
+            if not first:
+                file.write(',')
+            json.dump(item, file, indent=4)
+            first = False
+        file.write(']')
+
+
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    test_au_dir = os.path.join(current_dir, "works")
+    test_au_dir = "I:\\openalex\\works"
+    # test_au_dir = "authors"
 
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
-            directory_name = []
-            # 检查文件是否是 .gz 压缩文件
             if file_name.endswith('.gz'):
                 file_path = os.path.join(root, file_name)
-                print(file_path)
-                # 创建解压后的文件路径
+                print(root)
+                print(file_name)
                 extract_file_path = os.path.splitext(file_path)[0]
-
+                print(extract_file_path)
                 # 解压缩文件
                 with gzip.open(file_path, 'rb') as gz_file:
                     with open(extract_file_path, 'wb') as extracted_file:
                         extracted_file.write(gz_file.read())
 
-                for i in range(3):
-                    # new_data.append(a_data)
-                    directory_name.append(os.path.basename(file_path))
-                    # print(directory_name)
-                    # 获取目录部分的路径
-                    file_path = os.path.dirname(file_path)
+                # 处理JSON数据
+                generator = process_json_file(extract_file_path)
+                json_output_file = extract_file_path.replace("\\","_")
+                json_output_file = json_output_file + ".json"
+                print(json_output_file)
+                write_json_data(generator, json_output_file)
 
-            print(file_name)
-            file_name = file_name[:-3]
+                # 上传至服务器
+                remote_file_path = "/home/sa/Data-Script/works/" + os.path.basename(json_output_file)
+                upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
 
-            file_path = os.path.join(root, file_name)
+                # 清理本地文件
+                os.remove(extract_file_path)
+                os.remove(json_output_file)
 
-            # file_list = os.listdir(file_name)
-            # print(file_list)
-            # file_path = os.path.join(root, file_name)
-            # print(file_path)
-            with open(file_path, 'r') as file:
-                content = file.read()
-
-            num = 0
-            content = '[' + content + ']'
-            for char in content:
-                if char == "\n":
-                    num += 1
-
-            content = content.replace("}\n{", "},{")
-            data = json.loads(content)
-            # 转换数据格式
-            new_data = []
-            for index in range(num):
-                a_data = {
-                        "wid": data[index].get("id", "NULL"),
-                        "doi": data[index].get("doi", "NULL"),
-                        "title": data[index].get("title", "NULL"),
-                        "display_name": data[index].get("display_name", "NULL"),
-                        "publication_year": data[index].get("publication_year", "NULL"),
-                        "publication_date": data[index].get("publication_date", "NULL"),
-                        "language": data[index].get("language", "NULL"),
-                        "primary_location": data[index].get("primary_location", "NULL"),
-                        "type": data[index].get("type", "NULL"),
-                        "authorships": data[index].get("authorships", "NULL"),
-                        "countries_distinct_count": data[index].get("countries_distinct_count", "NULL"),
-                        "institutions_distinct_count": data[index].get("institutions_distinct_count", "NULL"),
-                        "cited_by_count": data[index].get("cited_by_count", "NULL"),
-                        "keywords": data[index].get("keywords", "NULL"),  # 设置默认值为 "NULL"
-                        "referenced_works_count": data[index].get("referenced_works_count", "NULL"),
-                        "referenced_works": data[index].get("referenced_works", "NULL"),
-                        "related_works": data[index].get("related_works", "NULL"),
-                        "counts_by_year": data[index].get("counts_by_year", "NULL"),
-                        "updated_date": data[index].get("updated_date", "NULL"),
-                        "created_date": data[index].get("created_date", "NULL"),
-                    # "display_name": data[index]["display_name"]
-                }
-                new_data.append(a_data)
-
-            file_name = file_name+".json"
-            # 输出到 data.json 文件
-            file_name = directory_name[2]+"_"+directory_name[1]+"_"+file_name
-            with open(file_name, 'w') as file:
-                file.write('[')
-                # json.dump(new_data, file, indent=4)
-                for index in range(num - 1):
-                    json.dump(new_data[index], file, indent=4)
-                    file.write(',')
-                json.dump(new_data[num - 1], file, indent=4)
-                file.write(']')
-
-            # 此时在当前目录下有相应的json文件,需上传至服务器
-            local_file_path = os.path.join(current_dir, file_name)
-            remote_file_path = "/home/sa/Data-Script/works/" + file_name
-            hostname = "116.63.49.180"
-            port = 22  # 默认SSH端口为22
-            username = "sa"
-            password = "@buaa-sa-13"
-
-            upload_file(local_file_path, remote_file_path, hostname, port, username, password)

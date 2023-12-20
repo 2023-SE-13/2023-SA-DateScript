@@ -3,7 +3,6 @@ import os
 import json
 import gzip
 import paramiko
-import ijson
 
 
 def upload_file(local_path, remote_path, hostname, port, username, password):
@@ -96,8 +95,8 @@ def write_json_data(ggenerator, output_file):
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    #test_au_dir = "E:\\openalex-snapshot\\data\\authors"
-    test_au_dir = "authors"
+    test_au_dir = "I:\\openalex\\authors"
+    # test_au_dir = "authors"
 
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
@@ -120,8 +119,8 @@ if __name__ == '__main__':
                 write_json_data(generator, json_output_file)
 
                 # 上传至服务器
-                #remote_file_path = "/home/sa/Data-Script/authors/" + os.path.basename(json_output_file)
-                #upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
+                remote_file_path = "/home/sa/Data-Script/authors/" + os.path.basename(json_output_file)
+                upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
 
                 # 清理本地文件
                 os.remove(extract_file_path)
