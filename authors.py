@@ -96,14 +96,17 @@ def write_json_data(ggenerator, output_file):
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    test_au_dir = "E:\\openalex-snapshot\\data\\authors"
+    #test_au_dir = "E:\\openalex-snapshot\\data\\authors"
+    test_au_dir = "authors"
 
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
             if file_name.endswith('.gz'):
                 file_path = os.path.join(root, file_name)
+                print(root)
+                print(file_name)
                 extract_file_path = os.path.splitext(file_path)[0]
-
+                print(extract_file_path)
                 # 解压缩文件
                 with gzip.open(file_path, 'rb') as gz_file:
                     with open(extract_file_path, 'wb') as extracted_file:
@@ -111,12 +114,14 @@ if __name__ == '__main__':
 
                 # 处理JSON数据
                 generator = process_json_file(extract_file_path)
-                json_output_file = extract_file_path + ".json"
+                json_output_file = extract_file_path.replace("\\","_")
+                json_output_file = json_output_file + ".json"
+                print(json_output_file)
                 write_json_data(generator, json_output_file)
 
                 # 上传至服务器
-                remote_file_path = "/home/sa/Data-Script/authors/" + os.path.basename(json_output_file)
-                upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
+                #remote_file_path = "/home/sa/Data-Script/authors/" + os.path.basename(json_output_file)
+                #upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
 
                 # 清理本地文件
                 os.remove(extract_file_path)
