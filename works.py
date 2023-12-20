@@ -78,15 +78,9 @@ def process_json_file(efile_path):
 
 def write_json_data(ggenerator, output_file):
     with open(output_file, 'w') as file:
-        file.write('[')
-        first = True
         for item in ggenerator:
-            if not first:
-                file.write(',')
-            json.dump(item, file, indent=4)
-            first = False
-        file.write(']')
-
+            json.dump(item, file)
+            file.write(','+'\n')
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
