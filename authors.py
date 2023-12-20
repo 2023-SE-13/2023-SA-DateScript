@@ -3,7 +3,6 @@ import os
 import json
 import gzip
 import paramiko
-import ijson
 
 
 def upload_file(local_path, remote_path, hostname, port, username, password):
