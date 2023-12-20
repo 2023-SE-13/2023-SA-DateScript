@@ -41,13 +41,15 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
             sftp.close()
         client.close()
 
+
 def process_json_file(efile_path):
     with open(efile_path, 'r') as file:
         for line in file:
             if line.strip():  # 确保行非空
                 obj = json.loads(line)
-                a_data = {
-                    "wid": obj.get("id", "NULL"),
+                if all(field in obj for field in required_fields):
+                    a_data = {
+                        "wid": obj.get("id", "NULL"),
                         "doi": obj.get("doi", "NULL"),
                         "title": obj.get("title", "NULL"),
                         "display_name": obj.get("display_name", "NULL"),
@@ -67,8 +69,11 @@ def process_json_file(efile_path):
                         "counts_by_year": obj.get("counts_by_year", "NULL"),
                         "updated_date": obj.get("updated_date", "NULL"),
                         "created_date": obj.get("created_date", "NULL"),
-                }
-                yield a_data
+                    }
+                    yield a_data
+                else:
+                    # 如果对象缺少必需字段，则跳过此对象
+                    continue
 
 
 def write_json_data(ggenerator, output_file):
@@ -88,7 +93,7 @@ if __name__ == '__main__':
     current_dir = os.getcwd()
     test_au_dir = "I:\\openalex\\works"
     # test_au_dir = "authors"
-
+    required_fields = ['title']
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
             if file_name.endswith('.gz'):
