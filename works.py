@@ -80,13 +80,14 @@ def write_json_data(ggenerator, output_file):
     with open(output_file, 'w') as file:
         for item in ggenerator:
             json.dump(item, file)
-            file.write(','+'\n')
+            file.write('\n')
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    test_au_dir = "I:\\openalex\\works"
+    # test_au_dir = "I:\\openalex\\works"
     # test_au_dir = "authors"
+    test_au_dir = "E:\\openalex-snapshot\\data\\temp\\works"
     required_fields = ['title']
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
@@ -114,5 +115,5 @@ if __name__ == '__main__':
 
                 # 清理本地文件
                 os.remove(extract_file_path)
-                os.remove(json_output_file)
+                # os.remove(json_output_file)
 
