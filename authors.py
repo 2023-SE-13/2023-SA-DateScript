@@ -1,9 +1,9 @@
-# 这是一个示例 Python 脚本。
 import pandas as pd
 import os
 import json
 import gzip
 import paramiko
+import ijson
 
 
 def upload_file(local_path, remote_path, hostname, port, username, password):
@@ -43,30 +43,49 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
         client.close()
 
 
-def process_json_file(file_path, output_path):
-    with open(file_path, 'rb') as file:
-        # 使用ijson解析器逐个处理JSON对象
-        objects = ijson.items(file, 'item')
-        for obj in objects:
-            a_data = {
-                "aid": obj.get("aid"),
-                "display_name": obj.get("display_name", "NULL"),
-                "cited_by_count": obj.get("cited_by_count", "NULL"),
-                "counts_by_year": obj.get("counts_by_year", "NULL"),
-                "works_count": obj.get("works_count", "NULL"),
-                "most_cited_work": obj.get("most_cited_work", "NULL"),
-                "last_known_institution": obj.get("last_known_institution", "NULL"),
-                "summary_stats": obj.get("summary_stats", "NULL"),
-                "works_api_url": obj.get("works_api_url", "NULL"),
-            }
-            yield a_data
+# def process_json_file(efile_path):
+#     with open(efile_path, 'rb') as file:
+#         # 使用ijson解析器逐个处理JSON对象
+#         objects = ijson.items(file, 'item')
+#         for obj in objects:
+#             a_data = {
+#                 "aid": obj.get("aid"),
+#                 "display_name": obj.get("display_name", "NULL"),
+#                 "cited_by_count": obj.get("cited_by_count", "NULL"),
+#                 "counts_by_year": obj.get("counts_by_year", "NULL"),
+#                 "works_count": obj.get("works_count", "NULL"),
+#                 "most_cited_work": obj.get("most_cited_work", "NULL"),
+#                 "last_known_institution": obj.get("last_known_institution", "NULL"),
+#                 "summary_stats": obj.get("summary_stats", "NULL"),
+#                 "works_api_url": obj.get("works_api_url", "NULL"),
+#             }
+#             yield a_data
 
 
-def write_json_data(generator, output_file):
+def process_json_file(efile_path):
+    with open(efile_path, 'r') as file:
+        for line in file:
+            if line.strip():  # 确保行非空
+                obj = json.loads(line)
+                a_data = {
+                    "aid": obj.get("aid"),
+                    "display_name": obj.get("display_name", "NULL"),
+                    "cited_by_count": obj.get("cited_by_count", "NULL"),
+                    "counts_by_year": obj.get("counts_by_year", "NULL"),
+                    "works_count": obj.get("works_count", "NULL"),
+                    "most_cited_work": obj.get("most_cited_work", "NULL"),
+                    "last_known_institution": obj.get("last_known_institution", "NULL"),
+                    "summary_stats": obj.get("summary_stats", "NULL"),
+                    "works_api_url": obj.get("works_api_url", "NULL"),
+                }
+                yield a_data
+
+
+def write_json_data(ggenerator, output_file):
     with open(output_file, 'w') as file:
         file.write('[')
         first = True
-        for item in generator:
+        for item in ggenerator:
             if not first:
                 file.write(',')
             json.dump(item, file, indent=4)
