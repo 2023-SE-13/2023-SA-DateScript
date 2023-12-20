@@ -95,7 +95,7 @@ def write_json_data(ggenerator, output_file):
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    test_au_dir = "E:\\openalex-snapshot\\data\\authors"
+    test_au_dir = "I:\\openalex\\authors"
     # test_au_dir = "authors"
 
     for root, dirs, files in os.walk(test_au_dir):
