@@ -43,6 +43,47 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
             sftp.close()
         client.close()
 
+def process_json_file(efile_path):
+    with open(efile_path, 'r') as file:
+        for line in file:
+            if line.strip():  # 确保行非空
+                data = json.loads(line)
+                a_data = {
+                    "wid": data.get("id", "NULL"),
+                    "doi": data.get("doi", "NULL"),
+                    "title": data.get("title", "NULL"),
+                    "display_name": data.get("display_name", "NULL"),
+                    "publication_year": data.get("publication_year", "NULL"),
+                    "publication_date": data.get("publication_date", "NULL"),
+                    "language": data.get("language", "NULL"),
+                    "primary_location": data.get("primary_location", "NULL"),
+                    "type": data.get("type", "NULL"),
+                    "authorships": data.get("authorships", "NULL"),
+                    "countries_distinct_count": data.get("countries_distinct_count", "NULL"),
+                    "institutions_distinct_count": data.get("institutions_distinct_count", "NULL"),
+                    "cited_by_count": data.get("cited_by_count", "NULL"),
+                    "keywords": data.get("keywords", "NULL"),  # 设置默认值为 "NULL"
+                    "referenced_works_count": data.get("referenced_works_count", "NULL"),
+                    "referenced_works": data.get("referenced_works", "NULL"),
+                    "related_works": data.get("related_works", "NULL"),
+                    "counts_by_year": data.get("counts_by_year", "NULL"),
+                    "updated_date": data.get("updated_date", "NULL"),
+                    "created_date": data.get("created_date", "NULL"),
+                }
+                yield a_data
+
+
+def write_json_data(ggenerator, output_file):
+    with open(output_file, 'w') as file:
+        file.write('[')
+        first = True
+        for item in ggenerator:
+            if not first:
+                file.write(',')
+            json.dump(item, file, indent=4)
+            first = False
+        file.write(']')
+
 def read_file_lines(filename):
     lines = []
     try:
@@ -52,6 +93,7 @@ def read_file_lines(filename):
     except FileNotFoundError:
         print(f"文件 '{filename}' 不存在")
     return lines
+
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
@@ -76,103 +118,37 @@ if __name__ == '__main__':
                     with open(extract_file_path, 'wb') as extracted_file:
                         extracted_file.write(gz_file.read())
 
-
+                directory_name = []
+                # 处理JSON数据
+                generator = process_json_file(extract_file_path)
+                temp_file_path = extract_file_path
                 for i in range(3):
                     # new_data.append(a_data)
-                    directory_name.append(os.path.basename(file_path))
+                    directory_name.append(os.path.basename(temp_file_path))
                     # print(directory_name)
                     # 获取目录部分的路径
-                    file_path = os.path.dirname(file_path)
+                    temp_file_path = os.path.dirname(temp_file_path)
+                json_output_file = directory_name[2] + "_" + directory_name[1] + "_" + directory_name[0] + ".json"
+                print(json_output_file)
+                write_json_data(generator, json_output_file)
 
-
-            if len(directory_name) != 0:
-                for string in lines_array:
-                    if string == directory_name[1]:
-                        flag = 1
-                        break
+                if len(directory_name) != 0:
+                    for string in lines_array:
+                        if string == directory_name[1]:
+                            flag = 1
+                            break
 
                 if flag == 1:
                     continue
 
-                print(file_name)
-                file_name = file_name[:-3]
-                temp_name = file_name
-
-                file_path = os.path.join(root, file_name)
-
-                # file_list = os.listdir(file_name)
-                # print(file_list)
-                # file_path = os.path.join(root, file_name)
-                # print(file_path)
-                with open(file_path, 'r') as file:
-                    content = file.read()
-
-                num = 0
-                content = '[' + content + ']'
-                for char in content:
-                    if char == "\n":
-                        num += 1
-
-                content = content.replace("}\n{", "},{")
-                data = json.loads(content)
-                # 转换数据格式
-                new_data = []
-                for index in range(num):
-                    a_data = {
-                            "wid": data[index].get("id", "NULL"),
-                            "doi": data[index].get("doi", "NULL"),
-                            "title": data[index].get("title", "NULL"),
-                            "display_name": data[index].get("display_name", "NULL"),
-                            "publication_year": data[index].get("publication_year", "NULL"),
-                            "publication_date": data[index].get("publication_date", "NULL"),
-                            "language": data[index].get("language", "NULL"),
-                            "primary_location": data[index].get("primary_location", "NULL"),
-                            "type": data[index].get("type", "NULL"),
-                            "authorships": data[index].get("authorships", "NULL"),
-                            "countries_distinct_count": data[index].get("countries_distinct_count", "NULL"),
-                            "institutions_distinct_count": data[index].get("institutions_distinct_count", "NULL"),
-                            "cited_by_count": data[index].get("cited_by_count", "NULL"),
-                            "keywords": data[index].get("keywords", "NULL"),  # 设置默认值为 "NULL"
-                            "referenced_works_count": data[index].get("referenced_works_count", "NULL"),
-                            "referenced_works": data[index].get("referenced_works", "NULL"),
-                            "related_works": data[index].get("related_works", "NULL"),
-                            "counts_by_year": data[index].get("counts_by_year", "NULL"),
-                            "updated_date": data[index].get("updated_date", "NULL"),
-                            "created_date": data[index].get("created_date", "NULL"),
-                        # "display_name": data[index]["display_name"]
-                    }
-                    new_data.append(a_data)
-
-                file_name = file_name+".json"
-                # 输出到 data.json 文件
-                file_name = directory_name[2]+"_"+directory_name[1]+"_"+file_name
-                with open(file_name, 'w') as file:
-                    file.write('[')
-                    # json.dump(new_data, file, indent=4)
-                    for index in range(num - 1):
-                        json.dump(new_data[index], file, indent=4)
-                        file.write(',')
-                    json.dump(new_data[num - 1], file, indent=4)
-                    file.write(']')
-
-                # 此时在当前目录下有相应的json文件,需上传至服务器
-                local_file_path = os.path.join(current_dir, file_name)
-                remote_file_path = "/home/sa/Data-Script/works/" + file_name
-                hostname = "116.63.49.180"
-                port = 22  # 默认SSH端口为22
-                username = "sa"
-                password = "@buaa-sa-13"
-
-                upload_file(local_file_path, remote_file_path, hostname, port, username, password)
+                remote_file_path = "/home/sa/Data-Script/works/" + os.path.basename(json_output_file)
+                upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
 
                 mem_copy = "copied"+directory_name[2]+".txt"
                 with open(mem_copy, "a") as file:
                     file.write(directory_name[1])
                     file.write("\n")
 
-                file_path = os.path.join(directory_name[2], directory_name[1], temp_name)
-
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-                if os.path.exists(file_name):
-                    os.remove(file_name)
+                # 清理本地文件
+                os.remove(extract_file_path)
+                os.remove(json_output_file)
