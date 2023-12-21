@@ -7,3 +7,4 @@ LOG/
 *.json
 *.done
 temp/
+*.gz

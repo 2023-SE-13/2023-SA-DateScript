@@ -3,6 +3,12 @@ import os
 import json
 import gzip
 import paramiko
+import gzip
+
+def compress_file(input_file, output_file, compression_level=9):
+    with open(input_file, 'rb') as f_in:
+        with gzip.open(output_file, 'wb', compresslevel=compression_level) as f_out:
+            f_out.writelines(f_in)
 
 
 def upload_file(local_path, remote_path, hostname, port, username, password):
@@ -90,7 +96,7 @@ if __name__ == '__main__':
     current_dir = os.getcwd()
     # test_au_dir = "I:\\openalex\\works"
     # test_au_dir = "authors"
-    test_au_dir = "E:\\openalex-snapshot\\data\\works"
+    test_au_dir = "E:\\openalex-snapshot\\data\\test"
     required_fields = ['title']
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
@@ -99,13 +105,14 @@ if __name__ == '__main__':
                 print(root)
                 print(file_name)
                 extract_file_path = os.path.splitext(file_path)[0]
-                print(extract_file_path)
+                print("begin to unzip file:" + file_path)
                 # 解压缩文件
                 with gzip.open(file_path, 'rb') as gz_file:
                     with open(extract_file_path, 'wb') as extracted_file:
                         extracted_file.write(gz_file.read())
 
                 directory_name = []
+                print("unzip file done:" + file_path)
                 print("begin to process json file:" + extract_file_path)
                 # 处理JSON数据
                 generator = process_json_file(extract_file_path)
@@ -120,14 +127,20 @@ if __name__ == '__main__':
                 print("process json file done:" + extract_file_path)
 
                 print("begin to write json data:" + json_output_file)
-                write_json_data(generator, json_output_file)
+                # write_json_data(generator, json_output_file)
                 print("write json data done:" + json_output_file)
+
+                print("begin to compress file:" + json_output_file)
+                compressed_file = json_output_file + ".gz"
+                compress_file(json_output_file, compressed_file)
+                print("compress file done:" + json_output_file)
 
                 # 上传至服务器
                 remote_file_path = "/home/sa/Data-Script/works/" + os.path.basename(json_output_file)
-                upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
+                # upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
 
                 # 清理本地文件
                 os.remove(extract_file_path)
-                os.remove(json_output_file)
+                # os.remove(json_output_file)
+                # os.remove(compressed_file)
 

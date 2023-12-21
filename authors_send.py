@@ -49,14 +49,14 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
 #         for obj in objects:
 #             a_data = {
 #                 "aid": obj.get("aid"),
-#                 "display_name": obj.get("display_name", "NULL"),
-#                 "cited_by_count": obj.get("cited_by_count", "NULL"),
-#                 "counts_by_year": obj.get("counts_by_year", "NULL"),
-#                 "works_count": obj.get("works_count", "NULL"),
-#                 "most_cited_work": obj.get("most_cited_work", "NULL"),
-#                 "last_known_institution": obj.get("last_known_institution", "NULL"),
-#                 "summary_stats": obj.get("summary_stats", "NULL"),
-#                 "works_api_url": obj.get("works_api_url", "NULL"),
+#                 "display_name": obj.get("display_name", None),
+#                 "cited_by_count": obj.get("cited_by_count", None),
+#                 "counts_by_year": obj.get("counts_by_year", None),
+#                 "works_count": obj.get("works_count", None),
+#                 "most_cited_work": obj.get("most_cited_work", None),
+#                 "last_known_institution": obj.get("last_known_institution", None),
+#                 "summary_stats": obj.get("summary_stats", None),
+#                 "works_api_url": obj.get("works_api_url", None),
 #             }
 #             yield a_data
 
@@ -67,15 +67,15 @@ def process_json_file(efile_path):
             if line.strip():  # 确保行非空
                 obj = json.loads(line)
                 a_data = {
-                    "aid": obj.get("aid"),
-                    "display_name": obj.get("display_name", "NULL"),
-                    "cited_by_count": obj.get("cited_by_count", "NULL"),
-                    "counts_by_year": obj.get("counts_by_year", "NULL"),
-                    "works_count": obj.get("works_count", "NULL"),
-                    "most_cited_work": obj.get("most_cited_work", "NULL"),
-                    "last_known_institution": obj.get("last_known_institution", "NULL"),
-                    "summary_stats": obj.get("summary_stats", "NULL"),
-                    "works_api_url": obj.get("works_api_url", "NULL"),
+                    "aid": obj.get("id"),
+                    "display_name": obj.get("display_name", None),
+                    "cited_by_count": obj.get("cited_by_count", None),
+                    "counts_by_year": obj.get("counts_by_year", None),
+                    "works_count": obj.get("works_count", None),
+                    "most_cited_work": obj.get("most_cited_work", None),
+                    "last_known_institution": obj.get("last_known_institution", None),
+                    "summary_stats": obj.get("summary_stats", None),
+                    "works_api_url": obj.get("works_api_url", None),
                 }
                 yield a_data
 
@@ -174,14 +174,14 @@ if __name__ == '__main__':
     #         for index in range(num):
     #             a_data = {
     #                 "aid": data[index].get("id"),
-    #                 "display_name": data[index].get("display_name", "NULL"),
-    #                 "cited_by_count": data[index].get("cited_by_count", "NULL"),
-    #                 "counts_by_year": data[index].get("counts_by_year", "NULL"),
-    #                 "works_count": data[index].get("works_count", "NULL"),
-    #                 "most_cited_work": data[index].get("most_cited_work", "NULL"),
-    #                 "last_known_institution": data[index].get("last_known_institution", "NULL"),
-    #                 "summary_stats": data[index].get("summary_stats", "NULL"),
-    #                 "works_api_url": data[index].get("works_api_url", "NULL"),
+    #                 "display_name": data[index].get("display_name", None),
+    #                 "cited_by_count": data[index].get("cited_by_count", None),
+    #                 "counts_by_year": data[index].get("counts_by_year", None),
+    #                 "works_count": data[index].get("works_count", None),
+    #                 "most_cited_work": data[index].get("most_cited_work", None),
+    #                 "last_known_institution": data[index].get("last_known_institution", None),
+    #                 "summary_stats": data[index].get("summary_stats", None),
+    #                 "works_api_url": data[index].get("works_api_url", None),
     #                 # "display_name": data[index]["display_name"]
     #             }
     #             new_data.append(a_data)
