@@ -105,13 +105,20 @@ if __name__ == '__main__':
                     with open(extract_file_path, 'wb') as extracted_file:
                         extracted_file.write(gz_file.read())
 
+                directory_name = []
                 print("begin to process json file:" + extract_file_path)
                 # 处理JSON数据
                 generator = process_json_file(extract_file_path)
+                temp_file_path = extract_file_path
+                for i in range(3):
+                    # new_data.append(a_data)
+                    directory_name.append(os.path.basename(temp_file_path))
+                    # print(directory_name)
+                    # 获取目录部分的路径
+                    temp_file_path = os.path.dirname(temp_file_path)
+                json_output_file = directory_name[2] + "_" + directory_name[1] + "_" + directory_name[0] + ".json"
                 print("process json file done:" + extract_file_path)
 
-                json_output_file = extract_file_path
-                json_output_file = json_output_file + ".json"
                 print("begin to write json data:" + json_output_file)
                 write_json_data(generator, json_output_file)
                 print("write json data done:" + json_output_file)
