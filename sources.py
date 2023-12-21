@@ -5,6 +5,7 @@ import json
 import gzip
 import paramiko
 
+
 def upload_file(local_path, remote_path, hostname, port, username, password):
     # 创建SSH客户端
     client = paramiko.SSHClient()
@@ -42,6 +43,7 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
         if sftp is not None:
             sftp.close()
         client.close()
+
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
@@ -95,18 +97,18 @@ if __name__ == '__main__':
             new_data = []
             for index in range(num):
                 a_data = {
-                        "sid": data[index].get("id", "NULL"),
-                        "abbreviated_title": data[index].get("abbreviated_title", "NULL"),
-                        "alternate_titles": data[index].get("alternate_titles", "NULL"),
-                        "cited_by_count": data[index].get("cited_by_count", "NULL"),
-                        "country_code": data[index].get("country_code", "NULL"),
-                        "counts_by_year": data[index].get("counts_by_year", "NULL"),
-                        "display_name": data[index].get("display_name", "NULL"),
-                        "homepage_url": data[index].get("homepage_url", "NULL"),
-                        "summary_stats": data[index].get("summary_stats", "NULL"),
-                        "type": data[index].get("type", "NULL"),
-                        "works_api_url": data[index].get("works_api_url", "NULL"),
-                        "works_count": data[index].get("works_count", "NULL"),
+                    "sid": data[index].get("id", "NULL"),
+                    "abbreviated_title": data[index].get("abbreviated_title", "NULL"),
+                    "alternate_titles": data[index].get("alternate_titles", "NULL"),
+                    "cited_by_count": data[index].get("cited_by_count", "NULL"),
+                    "country_code": data[index].get("country_code", "NULL"),
+                    "counts_by_year": data[index].get("counts_by_year", "NULL"),
+                    "display_name": data[index].get("display_name", "NULL"),
+                    "homepage_url": data[index].get("homepage_url", "NULL"),
+                    "summary_stats": data[index].get("summary_stats", "NULL"),
+                    "type": data[index].get("type", "NULL"),
+                    "works_api_url": data[index].get("works_api_url", "NULL"),
+                    "works_count": data[index].get("works_count", "NULL"),
                     # "display_name": data[index]["display_name"]
                 }
                 new_data.append(a_data)

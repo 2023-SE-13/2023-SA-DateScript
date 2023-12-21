@@ -28,12 +28,14 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
         except FileNotFoundError:
             sftp.mkdir(remote_directory)
 
+        print("uploading file: " + local_path)
         # 上传文件
         sftp.put(local_path, remote_path)
 
         # 在远程服务器上创建.done文件
         done_file_remote_path = remote_path + '.done'
         sftp.open(done_file_remote_path, 'w').close()
+        print("uploading file done: " + local_path)
 
     finally:
         # 关闭SFTP客户端和SSH客户端的连接
@@ -82,12 +84,13 @@ def write_json_data(ggenerator, output_file):
             json.dump(item, file)
             file.write('\n')
 
+
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
     # test_au_dir = "I:\\openalex\\works"
     # test_au_dir = "authors"
-    test_au_dir = "E:\\openalex-snapshot\\data\\temp\\works"
+    test_au_dir = "E:\\openalex-snapshot\\data\\works"
     required_fields = ['title']
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
@@ -102,12 +105,16 @@ if __name__ == '__main__':
                     with open(extract_file_path, 'wb') as extracted_file:
                         extracted_file.write(gz_file.read())
 
+                print("begin to process json file:" + extract_file_path)
                 # 处理JSON数据
                 generator = process_json_file(extract_file_path)
-                json_output_file = extract_file_path.replace("\\","_")
+                print("process json file done:" + extract_file_path)
+
+                json_output_file = extract_file_path
                 json_output_file = json_output_file + ".json"
-                print(json_output_file)
+                print("begin to write json data:" + json_output_file)
                 write_json_data(generator, json_output_file)
+                print("write json data done:" + json_output_file)
 
                 # 上传至服务器
                 remote_file_path = "/home/sa/Data-Script/works/" + os.path.basename(json_output_file)
@@ -115,5 +122,5 @@ if __name__ == '__main__':
 
                 # 清理本地文件
                 os.remove(extract_file_path)
-                # os.remove(json_output_file)
+                os.remove(json_output_file)
 

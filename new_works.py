@@ -5,6 +5,7 @@ import json
 import gzip
 import paramiko
 
+
 def upload_file(local_path, remote_path, hostname, port, username, password):
     # 创建SSH客户端
     client = paramiko.SSHClient()
