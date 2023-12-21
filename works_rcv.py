@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import gzip
 from elasticsearch import Elasticsearch, helpers
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -22,6 +23,13 @@ es = Elasticsearch(
     }],
     http_auth=(ES_USERNAME, ES_PASSWORD)
 )
+
+
+def decompress_gz(gz_path, output_path):
+    with gzip.open(gz_path, 'rb') as f_in:
+        with open(output_path, 'wb') as f_out:
+            f_out.write(f_in.read())
+
 
 # 准备批量上传的函数
 def bulk_index(file_path):
@@ -99,6 +107,33 @@ class Handler(FileSystemEventHandler):
                 print("error error error")
 
             # 删除.done文件
+            os.remove(event.src_path)
+        
+        elif event.event_type == 'created' and event.src_path.endswith('.gzdone'):
+            # 获取gzip文件的路径
+            gzip_file_path = event.src_path[:-7]  # 移除 ".gzdone" 后缀
+            json_file_path = gzip_file_path[:-3]  # 移除 ".gz" 后缀以获得JSON文件路径
+
+            print(f"Detected .gzdone file, processing: {gzip_file_path}")
+
+            # 解压gzip文件
+            if os.path.exists(gzip_file_path):
+                decompress_gz(gzip_file_path, json_file_path)
+                print(f"Decompressed file: {json_file_path}")
+
+                # 索引解压后的JSON文件
+                if bulk_index(json_file_path):
+                    os.remove(json_file_path)
+                    print(f"Finished indexing and deleted JSON file: {json_file_path}")
+                else:
+                    print(f"Failed to index JSON file: {json_file_path}")
+
+                # 删除原始的gzip文件
+                os.remove(gzip_file_path)
+            else:
+                print("Gzip file not found")
+
+            # 删除.gzdone文件
             os.remove(event.src_path)
 
 
