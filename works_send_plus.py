@@ -39,7 +39,7 @@ def upload_file(local_path, remote_path, hostname, port, username, password):
         sftp.put(local_path, remote_path)
 
         # 在远程服务器上创建.done文件
-        done_file_remote_path = remote_path + '.done'
+        done_file_remote_path = remote_path + '.gzdone'
         sftp.open(done_file_remote_path, 'w').close()
         print("uploading file done: " + local_path)
 
@@ -91,12 +91,11 @@ def write_json_data(ggenerator, output_file):
             file.write('\n')
 
 
-# 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    # test_au_dir = "I:\\openalex\\works"
-    # test_au_dir = "authors"
-    test_au_dir = "E:\\openalex-snapshot\\data\\test"
+    # test_au_dir = "E:\\openalex-snapshot\\data\\test"
+    test_au_dir = "E:\\openalex-snapshot\\data\\works"
+
     required_fields = ['title']
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
@@ -118,16 +117,14 @@ if __name__ == '__main__':
                 generator = process_json_file(extract_file_path)
                 temp_file_path = extract_file_path
                 for i in range(3):
-                    # new_data.append(a_data)
                     directory_name.append(os.path.basename(temp_file_path))
-                    # print(directory_name)
                     # 获取目录部分的路径
                     temp_file_path = os.path.dirname(temp_file_path)
                 json_output_file = directory_name[2] + "_" + directory_name[1] + "_" + directory_name[0] + ".json"
                 print("process json file done:" + extract_file_path)
 
                 print("begin to write json data:" + json_output_file)
-                # write_json_data(generator, json_output_file)
+                write_json_data(generator, json_output_file)
                 print("write json data done:" + json_output_file)
 
                 print("begin to compress file:" + json_output_file)
@@ -136,11 +133,11 @@ if __name__ == '__main__':
                 print("compress file done:" + json_output_file)
 
                 # 上传至服务器
-                remote_file_path = "/home/sa/Data-Script/works/" + os.path.basename(json_output_file)
-                # upload_file(json_output_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
+                remote_file_path = "/home/sa/Data-Script/works/" + os.path.basename(compressed_file)
+                upload_file(compressed_file, remote_file_path, "116.63.49.180", 22, "sa", "@buaa-sa-13")
 
                 # 清理本地文件
                 os.remove(extract_file_path)
-                # os.remove(json_output_file)
-                # os.remove(compressed_file)
+                os.remove(json_output_file)
+                os.remove(compressed_file)
 
