@@ -13,7 +13,6 @@ ES_PORT = 9200
 ES_USERNAME = "elastic"  # 替换为您的 Elasticsearch 用户名
 ES_PASSWORD = "yXC0ZTAbjmhmyLHb7fBv"  # 替换为您的 Elasticsearch 密码
 INDEX_NAME = "works"         # 根据您的需求更改
-DOC_TYPE = "_doc"
 
 # 初始化 Elasticsearch 客户端
 es = Elasticsearch(
@@ -22,7 +21,7 @@ es = Elasticsearch(
         'host': ES_HOST, 
         'port': ES_PORT
     }],
-    http_auth=(ES_USERNAME, ES_PASSWORD)
+    basic_auth=(ES_USERNAME, ES_PASSWORD)
 )
 
 
@@ -34,6 +33,7 @@ def decompress_gz(gz_path, output_path):
 
 # 准备批量上传的函数
 def bulk_index(file_path):
+    temp_val = 0
     try:
         with open(file_path, 'r') as file:
             actions = []
@@ -43,7 +43,6 @@ def bulk_index(file_path):
                 json_data = json.loads(line)  # 解析每一行为 JSON
                 action = {
                     "_index": INDEX_NAME,
-                    "_type": DOC_TYPE,
                     "_source": json_data
                 }
                 actions.append(action)
@@ -53,6 +52,7 @@ def bulk_index(file_path):
                 if count % 100 == 0:
                     helpers.bulk(es, actions)
                     # print("11111")
+                    temp_val = temp_val + 1
                     actions = []  # 清空列表以便下一批数据
 
             # 处理剩余的数据（如果有）
@@ -61,7 +61,7 @@ def bulk_index(file_path):
 
         return True
     except Exception as e:
-        print(f"Error indexing file {file_path}: {e}")
+        print(f"Error indexing file {file_path} {temp_val*100}: {e}")
         return False
 
 
