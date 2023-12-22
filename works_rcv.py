@@ -92,20 +92,20 @@ def bulk_index(file_path):
         with open(file_path, 'r') as file:
             actions = []
             count = 0
-
+            work_id = json_data.get('wid')
             for line in file:
                 json_data = json.loads(line)  # 解析每一行为 JSON
                 action = {
                     "_index": INDEX_NAME,
+                    "_id": work_id,
                     "_source": json_data
                 }
                 actions.append(action)
                 count += 1
 
-                # 每读取100个数据就进行一次批量上传
-                if count % 100 == 0:
+                # 每读取1000个数据就进行一次批量上传
+                if count % 1000 == 0:
                     helpers.bulk(es, actions)
-                    # print("11111")
                     actions = []  # 清空列表以便下一批数据
 
             # 处理剩余的数据（如果有）
