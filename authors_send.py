@@ -58,7 +58,7 @@ def process_json_file(efile_path):
                 if all(field in obj for field in required_fields):
                     a_data = {
                         "aid": obj.get("id"),
-                        "display_name": obj.get("display_name", None),
+                        "display_name": obj.get("display_name"),
                         "cited_by_count": obj.get("cited_by_count", None),
                         "counts_by_year": obj.get("counts_by_year", None),
                         "works_count": obj.get("works_count", None),
