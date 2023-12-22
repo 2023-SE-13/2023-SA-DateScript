@@ -77,6 +77,9 @@ def process_json_file(efile_path):
                         "counts_by_year": obj.get("counts_by_year", None),
                         "updated_date": obj.get("updated_date", None),
                         "created_date": obj.get("created_date", None),
+                        "abstract_inverted_index": obj.get("abstract_inverted_index", None),
+                        "concepts": obj.get("concepts", None),
+                        "collected_num": obj.get("collected_num", 0),
                     }
                     yield a_data
                 else:
