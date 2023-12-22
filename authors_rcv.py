@@ -94,7 +94,7 @@ def bulk_index(file_path):
             count = 0
             for line in file:
                 json_data = json.loads(line)  # 解析每一行为 JSON
-                author_id = json_data.get('aid')
+                author_id = json_data.pop('aid')
                 action = {
                     "_index": INDEX_NAME,
                     "_id": author_id,

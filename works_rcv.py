@@ -92,7 +92,7 @@ def bulk_index(file_path):
         with open(file_path, 'r') as file:
             actions = []
             count = 0
-            work_id = json_data.get('wid')
+            work_id = json_data.pop('wid')
             for line in file:
                 json_data = json.loads(line)  # 解析每一行为 JSON
                 action = {

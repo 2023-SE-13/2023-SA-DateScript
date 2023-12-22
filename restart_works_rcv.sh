@@ -10,7 +10,7 @@ pkill -f $SCRIPT_NAME
 sleep 2
 
 # 重新启动脚本
-nohup python3 -u $SCRIPT_NAME > output2.log 2>&1 &
+nohup python3 -u $SCRIPT_NAME > LOG/output2.log 2>&1 &
 
 echo "Script $SCRIPT_NAME has been restarted."
 
