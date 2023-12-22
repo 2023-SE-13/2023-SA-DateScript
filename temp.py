@@ -40,7 +40,6 @@ def get_access_token():
     url = f"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={CORP_ID}&corpsecret={CORP_SECRET}"
     response = requests.get(url)
     if response.status_code == 200:
-        print("access_token get success")
         return response.json().get('access_token')
     else:
         raise Exception("Failed to get access token")
@@ -68,11 +67,10 @@ def send_message(message):
     response = requests.post(url, json=message_data)
 
     if response.status_code == 200 and response.json().get("errcode") == 0:
-        print("send success")
         return response.json()
     else:
-        # 如果发送失败，尝试重新获取access_token并重发
         print(response.json())
+        # 如果发送失败，尝试重新获取access_token并重发
         ACCESS_TOKEN = get_access_token()
         url = f"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={ACCESS_TOKEN}"
         response = requests.post(url, json=message_data)
@@ -124,15 +122,10 @@ def bulk_index(file_path):
 # Elasticsearch 配置和初始化，以及 bulk_index 函数保持不变
 
 class Watcher:
-    DIRECTORY_TO_WATCH = "./works"
+    DIRECTORY_TO_WATCH = "./authors"
 
     def __init__(self):
         self.observer = Observer()
-
-    def count_files(self, extensions):
-        """统计目录中特定扩展名文件的数量"""
-        files = [f for f in os.listdir(self.DIRECTORY_TO_WATCH) if any(f.endswith(ext) for ext in extensions)]
-        return len(files)
 
     def run(self):
         event_handler = Handler()
@@ -141,8 +134,6 @@ class Watcher:
         try:
             while True:
                 time.sleep(5)
-                # if self.count_files(['.json', '.gzdone']) > 5:
-                #     send_message("File Alert: More than 5 files in directory.")
         except:
             self.observer.stop()
             print("Observer stopped")
@@ -150,56 +141,60 @@ class Watcher:
         self.observer.join()
 
 class Handler(FileSystemEventHandler):
-    @staticmethod
-    def process_json_file(json_file_path):
-        """处理JSON文件的通用逻辑"""
-        print(f"Processing JSON file: {json_file_path}")
-        if bulk_index(json_file_path):
-            os.remove(json_file_path)
-            print(f"Finished indexing and deleted file: {json_file_path}")
-            send_message(f"Finished indexing and deleted file: {json_file_path}")
-        else:
-            print(f"Failed to index file: {json_file_path}")
-
 
     @staticmethod
     def on_created(event):
         if event.is_directory:
             return None
 
-        if event.event_type == 'created':
-            if event.src_path.endswith('.done'):
-                # 处理.done文件
-                json_file_path = event.src_path[:-5]  # 获取JSON文件路径
-                print(f"Detected .done file for {json_file_path}")
+        if event.event_type == 'created' and event.src_path.endswith('.done'):
+            # 获取JSON文件的路径
+            json_file_path = event.src_path[:-5]
+            print(f"Detected .done file, processing: {json_file_path}")
 
-                if os.path.exists(json_file_path):
-                    Handler.process_json_file(json_file_path)
+            if os.path.exists(json_file_path):
+                if bulk_index(json_file_path):
+                    os.remove(json_file_path)
+                    print(f"Finished indexing and deleted file: {json_file_path}")
                 else:
-                    print("JSON file not found")
-                # 删除处理过的.done或.gzdone文件
-                os.remove(event.src_path)
+                    print(f"Failed to index file: {json_file_path}")
+            else:
+                print("error error error")
 
-            elif event.src_path.endswith('.gzdone'):
-                # 处理.gzdone文件
-                gzip_file_path = event.src_path[:-7]  # 获取gzip文件路径
-                json_file_path = gzip_file_path[:-3]  # 获取JSON文件路径
-                print(f"Detected .gzdone file for {gzip_file_path}")
+            # 删除.done文件
+            os.remove(event.src_path)
+        
+        elif event.event_type == 'created' and event.src_path.endswith('.gzdone'):
+            # 获取gzip文件的路径
+            gzip_file_path = event.src_path[:-7]  # 移除 ".gzdone" 后缀
+            json_file_path = gzip_file_path[:-3]  # 移除 ".gz" 后缀以获得JSON文件路径
 
-                if os.path.exists(gzip_file_path):
-                    decompress_gz(gzip_file_path, json_file_path)
-                    print(f"Decompressed file: {json_file_path}")
-                    Handler.process_json_file(json_file_path)
-                    os.remove(gzip_file_path)
+            print(f"Detected .gzdone file, processing: {gzip_file_path}")
+
+            # 解压gzip文件
+            if os.path.exists(gzip_file_path):
+                decompress_gz(gzip_file_path, json_file_path)
+                print(f"Decompressed file: {json_file_path}")
+
+                print(f"Begin to index JSON file: {json_file_path}")
+                # 索引解压后的JSON文件
+                if bulk_index(json_file_path):
+                    os.remove(json_file_path)
+                    print(f"Finished indexing and deleted JSON file: {json_file_path}")
                 else:
-                    print("Gzip file not found")
-                # 删除处理过的.done或.gzdone文件
-                os.remove(event.src_path)
+                    print(f"Failed to index JSON file: {json_file_path}")
 
-            
+                # 删除原始的gzip文件
+                os.remove(gzip_file_path)
+            else:
+                print("Gzip file not found")
+
+            # 删除.gzdone文件
+            os.remove(event.src_path)
 
 
 if __name__ == '__main__':
-    send_message("Server IS Ready to receive and index works!!!")
-    w = Watcher()
-    w.run()
+
+    send_message("Ready to receive and index works")
+    # w = Watcher()
+    # w.run()
