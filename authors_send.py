@@ -57,7 +57,7 @@ def process_json_file(efile_path):
                 obj = json.loads(line)
                 if all(field in obj for field in required_fields):
                     a_data = {
-                        "aid": obj.get("id",None),
+                        "aid": obj.get("id"),
                         "display_name": obj.get("display_name", None),
                         "cited_by_count": obj.get("cited_by_count", None),
                         "counts_by_year": obj.get("counts_by_year", None),
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     # test_au_dir = "E:\\openalex-snapshot\\data\\test"
     test_au_dir = "E:\\openalex-snapshot\\data\\authors"
 
-    required_fields = ['title']
+    required_fields = ['id', 'display_name']
     for root, dirs, files in os.walk(test_au_dir):
         for file_name in files:
             if file_name.endswith('.gz'):
