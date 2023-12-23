@@ -88,13 +88,15 @@ def decompress_gz(gz_path, output_path):
 
 # 准备批量上传的函数
 def bulk_index(file_path):
+    json_data = {}
     try:
         with open(file_path, 'r') as file:
             actions = []
             count = 0
-            work_id = json_data.pop('wid')
+            
             for line in file:
                 json_data = json.loads(line)  # 解析每一行为 JSON
+                work_id = json_data.get('wid')
                 action = {
                     "_index": INDEX_NAME,
                     "_id": work_id,
@@ -103,8 +105,8 @@ def bulk_index(file_path):
                 actions.append(action)
                 count += 1
 
-                # 每读取1000个数据就进行一次批量上传
-                if count % 1000 == 0:
+                # 每读取100个数据就进行一次批量上传
+                if count % 10 == 0:
                     helpers.bulk(es, actions)
                     actions = []  # 清空列表以便下一批数据
 
@@ -115,6 +117,7 @@ def bulk_index(file_path):
         return True
     except Exception as e:
         print(f"Error indexing file {file_path}: {e}")
+        print(f"{json.dumps(json_data)}")
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         text_message = f"Error indexing file {file_path} at {current_time}: {e}"
         send_message(text_message)
