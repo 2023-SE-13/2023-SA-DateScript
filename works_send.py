@@ -10,6 +10,20 @@ def convert_inverted_index_to_documents(inverted_index):
     return documents
 
 
+def rebuild_text_from_inverted_index(inverted_index):
+    # 创建一个以位置为键，单词为值的字典
+    position_word_map = {}
+    for word, positions in inverted_index.items():
+        for pos in positions:
+            position_word_map[pos] = word
+
+    # 根据位置排序并重建文本
+    sorted_positions = sorted(position_word_map.keys())
+    rebuilt_text = ' '.join([position_word_map[pos] for pos in sorted_positions])
+
+    return rebuilt_text
+
+
 def compress_file(input_file, output_file, compression_level=9):
     with open(input_file, 'rb') as f_in:
         with gzip.open(output_file, 'wb', compresslevel=compression_level) as f_out:
@@ -62,30 +76,30 @@ def process_json_file(efile_path):
                 obj = json.loads(line)
                 if all(field in obj for field in required_fields):
                     inverted_index = obj.get("abstract_inverted_index", {})
-                    converted_inverted_index = convert_inverted_index_to_documents(inverted_index)
+                    rebuilt_text = rebuild_text_from_inverted_index(inverted_index)
                     a_data = {
-                        "wid": obj.get("id", None),
+                        "wid": obj.get("id"),
                         "doi": obj.get("doi", None),
                         "title": obj.get("title", None),
                         "display_name": obj.get("display_name", None),
-                        "publication_year": obj.get("publication_year", None),
+                        "publication_year": obj.get("publication_year", 0),
                         "publication_date": obj.get("publication_date", None),
                         "language": obj.get("language", None),
-                        "primary_location": obj.get("primary_location", None),
+                        "primary_location": obj.get("primary_location", {}),
                         "type": obj.get("type", None),
-                        "authorships": obj.get("authorships", None),
-                        "countries_distinct_count": obj.get("countries_distinct_count", None),
-                        "institutions_distinct_count": obj.get("institutions_distinct_count", None),
-                        "cited_by_count": obj.get("cited_by_count", None),
+                        "authorships": obj.get("authorships", []),
+                        "countries_distinct_count": obj.get("countries_distinct_count", 0),
+                        "institutions_distinct_count": obj.get("institutions_distinct_count", 0),
+                        "cited_by_count": obj.get("cited_by_count", 0),
                         "keywords": obj.get("keywords", []),  # 设置默认值为 None
-                        "referenced_works_count": obj.get("referenced_works_count", None),
+                        "referenced_works_count": obj.get("referenced_works_count", 0),
                         "referenced_works": obj.get("referenced_works", None),
                         "related_works": obj.get("related_works", None),
-                        "counts_by_year": obj.get("counts_by_year", None),
+                        "counts_by_year": obj.get("counts_by_year", []),
                         "updated_date": obj.get("updated_date", None),
                         "created_date": obj.get("created_date", None),
-                        "abstract_inverted_index": converted_inverted_index,
-                        "concepts": obj.get("concepts", None),
+                        "abstract_inverted_index": rebuilt_text,
+                        "concepts": obj.get("concepts", []),
                         "collected_num": obj.get("collected_num", 0),
                     }
                     yield a_data
