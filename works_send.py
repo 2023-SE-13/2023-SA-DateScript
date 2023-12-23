@@ -64,28 +64,28 @@ def process_json_file(efile_path):
                     inverted_index = obj.get("abstract_inverted_index", {})
                     converted_inverted_index = convert_inverted_index_to_documents(inverted_index)
                     a_data = {
-                        "wid": obj.get("id", None),
+                        "wid": obj.get("id"),
                         "doi": obj.get("doi", None),
                         "title": obj.get("title", None),
                         "display_name": obj.get("display_name", None),
-                        "publication_year": obj.get("publication_year", None),
+                        "publication_year": obj.get("publication_year", 0),
                         "publication_date": obj.get("publication_date", None),
                         "language": obj.get("language", None),
-                        "primary_location": obj.get("primary_location", None),
+                        "primary_location": obj.get("primary_location", {}),
                         "type": obj.get("type", None),
-                        "authorships": obj.get("authorships", None),
-                        "countries_distinct_count": obj.get("countries_distinct_count", None),
-                        "institutions_distinct_count": obj.get("institutions_distinct_count", None),
-                        "cited_by_count": obj.get("cited_by_count", None),
+                        "authorships": obj.get("authorships", []),
+                        "countries_distinct_count": obj.get("countries_distinct_count", 0),
+                        "institutions_distinct_count": obj.get("institutions_distinct_count", 0),
+                        "cited_by_count": obj.get("cited_by_count", 0),
                         "keywords": obj.get("keywords", []),  # 设置默认值为 None
-                        "referenced_works_count": obj.get("referenced_works_count", None),
+                        "referenced_works_count": obj.get("referenced_works_count", 0),
                         "referenced_works": obj.get("referenced_works", None),
                         "related_works": obj.get("related_works", None),
-                        "counts_by_year": obj.get("counts_by_year", None),
+                        "counts_by_year": obj.get("counts_by_year", []),
                         "updated_date": obj.get("updated_date", None),
                         "created_date": obj.get("created_date", None),
                         "abstract_inverted_index": converted_inverted_index,
-                        "concepts": obj.get("concepts", None),
+                        "concepts": obj.get("concepts", []),
                         "collected_num": obj.get("collected_num", 0),
                     }
                     yield a_data
