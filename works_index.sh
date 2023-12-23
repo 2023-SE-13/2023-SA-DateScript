@@ -37,17 +37,7 @@ curl -X PUT "elastic:yXC0ZTAbjmhmyLHb7fBv@127.0.0.1:9200/works" -H "Content-Type
       },
       "updated_date": { "type": "date" },
       "created_date": { "type": "date" },
-      "abstract_inverted_index": {
-        "type": "object",
-        "properties": {
-          "word": {
-            "type": "keyword"
-          },
-          "positions": {
-            "type": "integer"
-          }
-        }
-      },
+      "abstract_inverted_index": { "type": "text" },
       "concepts": { "type": "nested" },
       "collected_num": { "type": "long" }
     }

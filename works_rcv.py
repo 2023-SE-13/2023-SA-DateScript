@@ -106,7 +106,7 @@ def bulk_index(file_path):
                 count += 1
 
                 # 每读取100个数据就进行一次批量上传
-                if count % 10 == 0:
+                if count % 1000 == 0:
                     helpers.bulk(es, actions)
                     actions = []  # 清空列表以便下一批数据
 
