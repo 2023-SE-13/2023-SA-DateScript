@@ -3,6 +3,13 @@ import json
 import paramiko
 import gzip
 
+
+def convert_inverted_index_to_documents(inverted_index):
+    # 将倒排索引转换为文档列表
+    documents = [{"word_index": key, "positions": positions} for key, positions in inverted_index.items()]
+    return documents
+
+
 def compress_file(input_file, output_file, compression_level=9):
     with open(input_file, 'rb') as f_in:
         with gzip.open(output_file, 'wb', compresslevel=compression_level) as f_out:
@@ -54,6 +61,8 @@ def process_json_file(efile_path):
             if line.strip():  # 确保行非空
                 obj = json.loads(line)
                 if all(field in obj for field in required_fields):
+                    inverted_index = obj.get("abstract_inverted_index", {})
+                    converted_inverted_index = convert_inverted_index_to_documents(inverted_index)
                     a_data = {
                         "wid": obj.get("id", None),
                         "doi": obj.get("doi", None),
@@ -75,7 +84,7 @@ def process_json_file(efile_path):
                         "counts_by_year": obj.get("counts_by_year", None),
                         "updated_date": obj.get("updated_date", None),
                         "created_date": obj.get("created_date", None),
-                        "abstract_inverted_index": obj.get("abstract_inverted_index", None),
+                        "abstract_inverted_index": converted_inverted_index,
                         "concepts": obj.get("concepts", None),
                         "collected_num": obj.get("collected_num", 0),
                     }
@@ -94,8 +103,8 @@ def write_json_data(ggenerator, output_file):
 
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    # test_au_dir = "E:\\openalex-snapshot\\data\\test"
-    test_au_dir = "E:\\openalex-snapshot\\data\\works"
+    test_au_dir = "E:\\openalex-snapshot\\data\\test"
+    # test_au_dir = "E:\\openalex-snapshot\\data\\works"
 
     required_fields = ['title']
     for root, dirs, files in os.walk(test_au_dir):
