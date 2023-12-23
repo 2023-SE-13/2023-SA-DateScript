@@ -10,6 +10,20 @@ def convert_inverted_index_to_documents(inverted_index):
     return documents
 
 
+def rebuild_text_from_inverted_index(inverted_index):
+    # 创建一个以位置为键，单词为值的字典
+    position_word_map = {}
+    for word, positions in inverted_index.items():
+        for pos in positions:
+            position_word_map[pos] = word
+
+    # 根据位置排序并重建文本
+    sorted_positions = sorted(position_word_map.keys())
+    rebuilt_text = ' '.join([position_word_map[pos] for pos in sorted_positions])
+
+    return rebuilt_text
+
+
 def compress_file(input_file, output_file, compression_level=9):
     with open(input_file, 'rb') as f_in:
         with gzip.open(output_file, 'wb', compresslevel=compression_level) as f_out:
@@ -62,7 +76,7 @@ def process_json_file(efile_path):
                 obj = json.loads(line)
                 if all(field in obj for field in required_fields):
                     inverted_index = obj.get("abstract_inverted_index", {})
-                    converted_inverted_index = convert_inverted_index_to_documents(inverted_index)
+                    rebuilt_text = rebuild_text_from_inverted_index(inverted_index)
                     a_data = {
                         "wid": obj.get("id"),
                         "doi": obj.get("doi", None),
@@ -84,7 +98,7 @@ def process_json_file(efile_path):
                         "counts_by_year": obj.get("counts_by_year", []),
                         "updated_date": obj.get("updated_date", None),
                         "created_date": obj.get("created_date", None),
-                        "abstract_inverted_index": converted_inverted_index,
+                        "abstract_inverted_index": rebuilt_text,
                         "concepts": obj.get("concepts", []),
                         "collected_num": obj.get("collected_num", 0),
                     }
