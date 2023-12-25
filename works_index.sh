@@ -1,9 +1,23 @@
-curl -X PUT "elastic:yXC0ZTAbjmhmyLHb7fBv@127.0.0.1:9200/works" -H "Content-Type: application/json" -d'
+curl -X PUT "elastic:yXC0ZTAbjmhmyLHb7fBv@127.0.0.1:9200/new_works" -H "Content-Type: application/json" -d'
 {
+  "settings": {
+    "index": {
+      "number_of_shards": 12,
+      "number_of_replicas": 0
+    }
+  },
   "mappings": {
     "properties": {
       "doi": { "type": "text" },
-      "title": { "type": "text" },
+      "title": 
+      { 
+        "type": "text" , 
+        "fields": {
+          "keyword": { 
+            "type": "keyword"
+          }
+        }
+      },
       "display_name": { "type": "text" },
       "publication_year": { "type": "long" },
       "publication_date": { "type": "text" },

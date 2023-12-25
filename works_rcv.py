@@ -13,7 +13,7 @@ ES_HOST = "localhost"
 ES_PORT = 9200
 ES_USERNAME = "elastic"  # 替换为您的 Elasticsearch 用户名
 ES_PASSWORD = "yXC0ZTAbjmhmyLHb7fBv"  # 替换为您的 Elasticsearch 密码
-INDEX_NAME = "works"         # 根据您的需求更改
+INDEX_NAME = "new_works"         # 根据您的需求更改
 DOC_TYPE = "_doc"
 
 CORP_ID = "ww139c8045e371e29e"
