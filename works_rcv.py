@@ -79,7 +79,6 @@ def send_message(message):
         return response.json()
 
 
-
 def decompress_gz(gz_path, output_path):
     with gzip.open(gz_path, 'rb') as f_in:
         with open(output_path, 'wb') as f_out:
@@ -144,13 +143,11 @@ class Watcher:
         try:
             while True:
                 time.sleep(5)
-                # if self.count_files(['.json', '.gzdone']) > 5:
-                #     send_message("File Alert: More than 5 files in directory.")
         except:
             self.observer.stop()
             print("Observer stopped")
-
         self.observer.join()
+
 
 class Handler(FileSystemEventHandler):
     @staticmethod

@@ -2,11 +2,6 @@ import os
 import json
 import paramiko
 import gzip
-import logging
-
-
-logging.basicConfig(filename='ws.log', level=logging.INFO,
-                    format='%(asctime)s:%(levelname)s:%(message)s')
 
 
 def convert_inverted_index_to_documents(inverted_index):
@@ -82,8 +77,6 @@ def process_json_file(efile_path):
                 if all(field in obj for field in required_fields):
                     inverted_index = obj.get("abstract_inverted_index") or {}
                     rebuilt_text = rebuild_text_from_inverted_index(inverted_index)
-                    if(len(rebuilt_text) > 0):
-                        logging.info(f"Rebuilt text: {rebuilt_text}")
                     a_data = {
                         "wid": obj.get("id"),
                         "doi": obj.get("doi", None),
